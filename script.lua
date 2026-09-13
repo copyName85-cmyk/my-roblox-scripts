@@ -13,10 +13,11 @@ ScreenGui.Name = "SpeedMenuGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
+-- Главный фрейм (Меню) - Сделали чуть шире для удобства
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 300, 0, 260)
-MainFrame.Position = UDim2.new(0.5, -150, 0.4, -130)
+MainFrame.Size = UDim2.new(0, 310, 0, 260)
+MainFrame.Position = UDim2.new(0.5, -155, 0.4, -130)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -33,17 +34,6 @@ HeaderFrame.Size = UDim2.new(1, 0, 0, 40)
 HeaderFrame.BackgroundTransparency = 1
 HeaderFrame.ZIndex = 2
 HeaderFrame.Parent = MainFrame
-
-local ContentFrame = Instance.new("ScrollingFrame")
-ContentFrame.Name = "ContentFrame"
-ContentFrame.Size = UDim2.new(1, 0, 0, 210)
-ContentFrame.Position = UDim2.new(0, 0, 0, 40)
-ContentFrame.BackgroundTransparency = 1
-ContentFrame.ZIndex = 2
-ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 370)
-ContentFrame.ScrollBarThickness = 4
-ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 140, 255)
-ContentFrame.Parent = MainFrame
 
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Name = "TitleLabel"
@@ -81,26 +71,36 @@ CloseButton.TextSize = 16
 CloseButton.Font = Enum.Font.ArialBold
 CloseButton.ZIndex = 4
 CloseButton.Parent = HeaderFrame
+
+-- ИСПРАВЛЕНО: Закрепленная зона для слайдера вне скролла (для 100% плавности)
+local FixedSliderFrame = Instance.new("Frame")
+FixedSliderFrame.Name = "FixedSliderFrame"
+FixedSliderFrame.Size = UDim2.new(1, 0, 0, 55)
+FixedSliderFrame.Position = UDim2.new(0, 0, 0, 40)
+FixedSliderFrame.BackgroundTransparency = 1
+FixedSliderFrame.ZIndex = 2
+FixedSliderFrame.Parent = MainFrame
+
 local SpeedValueLabel = Instance.new("TextLabel")
 SpeedValueLabel.Name = "SpeedValueLabel"
-SpeedValueLabel.Size = UDim2.new(1, 0, 0, 30)
-SpeedValueLabel.Position = UDim2.new(0, 0, 0, 5)
+SpeedValueLabel.Size = UDim2.new(1, 0, 0, 25)
+SpeedValueLabel.Position = UDim2.new(0, 0, 0, 2)
 SpeedValueLabel.BackgroundTransparency = 1
 SpeedValueLabel.Text = "Выбрано: 16"
 SpeedValueLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 SpeedValueLabel.TextSize = 15
 SpeedValueLabel.Font = Enum.Font.SourceSans
 SpeedValueLabel.ZIndex = 3
-SpeedValueLabel.Parent = ContentFrame
+SpeedValueLabel.Parent = FixedSliderFrame
 
 local SliderTrack = Instance.new("Frame")
 SliderTrack.Name = "SliderTrack"
 SliderTrack.Size = UDim2.new(0, 240, 0, 6)
-SliderTrack.Position = UDim2.new(0.5, -120, 0, 45)
+SliderTrack.Position = UDim2.new(0.5, -120, 0, 34)
 SliderTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 SliderTrack.BorderSizePixel = 0
 SliderTrack.ZIndex = 3
-SliderTrack.Parent = ContentFrame
+SliderTrack.Parent = FixedSliderFrame
 
 Instance.new("UICorner", SliderTrack).CornerRadius = UDim.new(1, 0)
 
@@ -115,29 +115,53 @@ SliderButton.ZIndex = 4
 SliderButton.Parent = SliderTrack
 
 Instance.new("UICorner", SliderButton).CornerRadius = UDim.new(1, 0)
+-- ИСПРАВЛЕНО: ScrollingFrame теперь начинается ниже слайдера и крутится без багов
+local ContentFrame = Instance.new("ScrollingFrame")
+ContentFrame.Name = "ContentFrame"
+ContentFrame.Size = UDim2.new(1, 0, 0, 155)
+ContentFrame.Position = UDim2.new(0, 0, 0, 95)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.ZIndex = 2
+ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 290)
+ContentFrame.ScrollBarThickness = 4
+ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 140, 255)
+ContentFrame.Parent = MainFrame
 
-local function createToggle(name, text, yPos)
+-- ИСПРАВЛЕНО: Автоматический менеджер отступов для идеально равного расстояния
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ContentFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 6) -- Одинаковое расстояние между кнопками в 6 пикселей
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function createToggle(name, text)
 	local frame = Instance.new("Frame")
-	frame.Name = name .. "Frame"; frame.Size = UDim2.new(0, 240, 0, 40); frame.Position = UDim2.new(0.5, -120, 0, yPos); frame.BackgroundTransparency = 1; frame.ZIndex = 3; frame.Parent = ContentFrame
+	frame.Name = name .. "Frame"
+	frame.Size = UDim2.new(0, 240, 0, 40)
+	frame.BackgroundTransparency = 1
+	frame.ZIndex = 3
+	frame.Parent = ContentFrame
+
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.new(0, 180, 1, 0); label.BackgroundTransparency = 1; label.Text = text; label.TextColor3 = Color3.fromRGB(255, 255, 255); label.TextSize = 16; label.TextXAlignment = Enum.TextXAlignment.Left; label.Font = Enum.Font.SourceSans; label.ZIndex = 3; label.Parent = frame
+	
 	local button = Instance.new("TextButton")
-	button.Name = name .. "Button"; button.Size = UDim2.new(0, 46, 0, 24); button.Position = UDim2.new(1, -46, 0.5, -12)
-	button.BackgroundColor3 = Color3.fromRGB(120, 40, 40); button.Text = ""; button.ZIndex = 4; button.Parent = frame
+	button.Name = name .. "Button"; button.Size = UDim2.new(0, 46, 0, 24); button.Position = UDim2.new(1, -46, 0.5, -12); button.BackgroundColor3 = Color3.fromRGB(120, 40, 40); button.Text = ""; button.ZIndex = 4; button.Parent = frame
 	Instance.new("UICorner", button).CornerRadius = UDim.new(1, 0)
+	
 	local circle = Instance.new("Frame")
 	circle.Size = UDim2.new(0, 18, 0, 18); circle.Position = UDim2.new(0, 3, 0.5, -9); circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255); circle.ZIndex = 5; circle.Parent = button
 	Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
 	return button, circle
 end
 
-local SpeedToggleButton, SpeedToggleCircle = createToggle("SpeedToggle", "Скорость:", 75)
-local JumpToggleButton, JumpToggleCircle = createToggle("JumpToggle", "Бесконечный прыжок:", 120)
-local NoFallToggleButton, NoFallToggleCircle = createToggle("NoFallToggle", "Без урона от падения:", 165)
-local FlyToggleButton, FlyToggleCircle = createToggle("FlyToggle", "Режим полета (Fly):", 210)
-local NoclipToggleButton, NoclipToggleCircle = createToggle("NoclipToggle", "Сквозь стены (Noclip):", 265)
-local TpToggleButton, TpToggleCircle = createToggle("TpToggle", "Телепорт по клику (TP):", 310)
-local EspToggleButton, EspToggleCircle = createToggle("EspToggle", "Подсветка игроков (ESP):", 345)
+local SpeedToggleButton, SpeedToggleCircle = createToggle("SpeedToggle", "Скорость:")
+local JumpToggleButton, JumpToggleCircle = createToggle("JumpToggle", "Бесконечный прыжок:")
+local NoFallToggleButton, NoFallToggleCircle = createToggle("NoFallToggle", "Без урона от падения:")
+local FlyToggleButton, FlyToggleCircle = createToggle("FlyToggle", "Режим полета (Fly):")
+local NoclipToggleButton, NoclipToggleCircle = createToggle("NoclipToggle", "Сквозь стены (Noclip):")
+local TpToggleButton, TpToggleCircle = createToggle("TpToggle", "Телепорт по клику (TP):")
+local EspToggleButton, EspToggleCircle = createToggle("EspToggle", "Подсветка игроков (ESP):")
 
 local MIN_SPEED, MAX_SPEED, targetSpeed = 0, 100, DEFAULT_SPEED
 local isSpeedEnabled, isJumpEnabled, isNoFallEnabled, isFlyEnabled, isNoclipEnabled, isTpEnabled, isEspEnabled = false, false, false, false, false, false, false
@@ -155,7 +179,8 @@ UserInputService.InputChanged:Connect(function(input)
 		local delta = input.Position - dragStart
 		MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
-end)local TpZoneFrame = Instance.new("Frame")
+end)
+local TpZoneFrame = Instance.new("Frame")
 TpZoneFrame.Name = "TpZoneFrame"; TpZoneFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); TpZoneFrame.BackgroundTransparency = 1; TpZoneFrame.Visible = false; TpZoneFrame.Parent = ScreenGui
 local ZoneStroke = Instance.new("UIStroke")
 ZoneStroke.Color = Color3.fromRGB(255, 255, 255); ZoneStroke.Thickness = 2; ZoneStroke.Transparency = 0.3; ZoneStroke.Parent = TpZoneFrame
@@ -262,7 +287,7 @@ local function updateSlider(inputPosition)
 end
 SliderButton.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then isDragging = true end end)
 UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then isDragging = false end end)
-SliderButton.InputChanged:Connect(function(input) if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then updateSlider(input.Position) end end)
+UserInputService.InputChanged:Connect(function(input) if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then updateSlider(input.Position) end end)
 
 local function toggleVisual(state, button, circle)
 	if state then button.BackgroundColor3 = Color3.fromRGB(46, 204, 113); circle.Position = UDim2.new(1, -21, 0.5, -9)
@@ -278,8 +303,9 @@ TpToggleButton.MouseButton1Click:Connect(function() isTpEnabled = not isTpEnable
 EspToggleButton.MouseButton1Click:Connect(function() isEspEnabled = not isEspEnabled; toggleVisual(isEspEnabled, EspToggleButton, EspToggleCircle); refreshEsp() end)
 
 MinimizeButton.MouseButton1Click:Connect(function()
-	isMinimized = not isMinimized; ContentFrame.Visible = not isMinimized
-	MainFrame.Size = isMinimized and UDim2.new(0, 300, 0, 40) or UDim2.new(0, 300, 0, 260)
+	isMinimized = not isMinimized
+	ContentFrame.Visible = not isMinimized; FixedSliderFrame.Visible = not isMinimized
+	MainFrame.Size = isMinimized and UDim2.new(0, 310, 0, 40) or UDim2.new(0, 310, 0, 260)
 	MinimizeButton.Text = isMinimized and "+" or "—"
 end)
 
@@ -289,3 +315,4 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 LocalPlayer.CharacterAdded:Connect(function(char) char:WaitForChild("Humanoid", 5); task.wait(0.2); applySpeed() end)
+
