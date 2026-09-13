@@ -123,7 +123,6 @@ local function createToggle(name, text, yPos)
 	label.Size = UDim2.new(0, 180, 1, 0); label.BackgroundTransparency = 1; label.Text = text; label.TextColor3 = Color3.fromRGB(255, 255, 255); label.TextSize = 16; label.TextXAlignment = Enum.TextXAlignment.Left; label.Font = Enum.Font.SourceSans; label.ZIndex = 3; label.Parent = frame
 	local button = Instance.new("TextButton")
 	button.Name = name .. "Button"; button.Size = UDim2.new(0, 46, 0, 24); button.Position = UDim2.new(1, -46, 0.5, -12)
-
 	button.BackgroundColor3 = Color3.fromRGB(120, 40, 40); button.Text = ""; button.ZIndex = 4; button.Parent = frame
 	Instance.new("UICorner", button).CornerRadius = UDim.new(1, 0)
 	local circle = Instance.new("Frame")
@@ -136,7 +135,7 @@ local SpeedToggleButton, SpeedToggleCircle = createToggle("SpeedToggle", "Ско
 local JumpToggleButton, JumpToggleCircle = createToggle("JumpToggle", "Бесконечный прыжок:", 120)
 local NoFallToggleButton, NoFallToggleCircle = createToggle("NoFallToggle", "Без урона от падения:", 165)
 local FlyToggleButton, FlyToggleCircle = createToggle("FlyToggle", "Режим полета (Fly):", 210)
-local NoclipToggleButton, NoclipToggleCircle = createToggle("NoclipToggle", "Сквозь стены (Noclip):", 255)
+local NoclipToggleButton, NoclipToggleCircle = createToggle("NoclipToggle", "Сквозь стены (Noclip):", 265)
 local TpToggleButton, TpToggleCircle = createToggle("TpToggle", "Телепорт по клику (TP):", 310)
 local EspToggleButton, EspToggleCircle = createToggle("EspToggle", "Подсветка игроков (ESP):", 345)
 
@@ -156,8 +155,7 @@ UserInputService.InputChanged:Connect(function(input)
 		local delta = input.Position - dragStart
 		MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
-end)
-local TpZoneFrame = Instance.new("Frame")
+end)local TpZoneFrame = Instance.new("Frame")
 TpZoneFrame.Name = "TpZoneFrame"; TpZoneFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); TpZoneFrame.BackgroundTransparency = 1; TpZoneFrame.Visible = false; TpZoneFrame.Parent = ScreenGui
 local ZoneStroke = Instance.new("UIStroke")
 ZoneStroke.Color = Color3.fromRGB(255, 255, 255); ZoneStroke.Thickness = 2; ZoneStroke.Transparency = 0.3; ZoneStroke.Parent = TpZoneFrame
@@ -183,6 +181,7 @@ UserInputService.JumpRequest:Connect(function()
 		LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
 	end
 end)
+
 local function teleportToMouse(inputPosition)
 	if not isTpEnabled then return end
 	local character = LocalPlayer.Character; if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -201,20 +200,22 @@ UserInputService.InputBegan:Connect(function(input, gp) if not gp and isTpEnable
 local function createEspElements(player)
 	if player == LocalPlayer then return end
 	local function drawEsp()
-		local character = player.Character; if not character then return end
-		local rootPart = character:WaitForChild("HumanoidRootPart", 5); local humanoid = character:WaitForChild("Humanoid", 5)
-		if not rootPart or not humanoid then return end
-		local highlight = rootPart:FindFirstChild("EspHighlight") or Instance.new("Highlight")
-		highlight.Name = "EspHighlight"; highlight.FillColor = Color3.fromRGB(0, 140, 255); highlight.FillTransparency = 0.6; highlight.OutlineColor = Color3.fromRGB(255, 255, 255); highlight.OutlineTransparency = 0.2; highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; highlight.Enabled = isEspEnabled; highlight.Parent = rootPart
-		local billboard = rootPart:FindFirstChild("EspBillboard") or Instance.new("BillboardGui")
-		billboard.Name = "EspBillboard"; billboard.Size = UDim2.new(0, 200, 0, 50); billboard.AlwaysOnTop = true; billboard.ExtentsOffset = Vector3.new(0, 3, 0); billboard.Enabled = isEspEnabled; billboard.Parent = rootPart
-		local label = billboard:FindFirstChild("EspLabel") or Instance.new("TextLabel")
-		label.Name = "EspLabel"; label.Size = UDim2.new(1, 0, 1, 0); label.BackgroundTransparency = 1; label.TextColor3 = Color3.fromRGB(255, 255, 255); label.TextStrokeTransparency = 0; label.TextSize = 13; label.Font = Enum.Font.SourceSansBold; label.Text = player.Name .. " [" .. math.round(humanoid.Health) .. " HP]"; label.Parent = billboard
+		task.spawn(function()
+			local character = player.Character; if not character then return end
+			local rootPart = character:WaitForChild("HumanoidRootPart", 5); local humanoid = character:WaitForChild("Humanoid", 5)
+			if not rootPart or not humanoid then return end
+			local highlight = rootPart:FindFirstChild("EspHighlight") or Instance.new("Highlight")
+			highlight.Name = "EspHighlight"; highlight.FillColor = Color3.fromRGB(0, 140, 255); highlight.FillTransparency = 0.6; highlight.OutlineColor = Color3.fromRGB(255, 255, 255); highlight.OutlineTransparency = 0.2; highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; highlight.Enabled = isEspEnabled; highlight.Parent = rootPart
+			local billboard = rootPart:FindFirstChild("EspBillboard") or Instance.new("BillboardGui")
+			billboard.Name = "EspBillboard"; billboard.Size = UDim2.new(0, 200, 0, 50); billboard.AlwaysOnTop = true; billboard.ExtentsOffset = Vector3.new(0, 3, 0); billboard.Enabled = isEspEnabled; billboard.Parent = rootPart
+			local label = billboard:FindFirstChild("EspLabel") or Instance.new("TextLabel")
+			label.Name = "EspLabel"; label.Size = UDim2.new(1, 0, 1, 0); label.BackgroundTransparency = 1; label.TextColor3 = Color3.fromRGB(255, 255, 255); label.TextStrokeTransparency = 0; label.TextSize = 13; label.Font = Enum.Font.SourceSansBold; label.Text = player.Name .. " [" .. math.round(humanoid.Health) .. " HP]"; label.Parent = billboard
+		end)
 	end
 	if player.Character then drawEsp() end
 	player.CharacterAdded:Connect(drawEsp)
 end
-for _, p in pairs(Players:GetPlayers()) do createEspElements(p) end
+task.spawn(function() for _, p in pairs(Players:GetPlayers()) do createEspElements(p); task.wait(0.02) end end)
 Players.PlayerAdded:Connect(createEspElements)
 
 local function refreshEsp()
